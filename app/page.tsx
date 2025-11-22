@@ -214,7 +214,7 @@ export default function Home() {
   ]);
 
   return (
-    <div className="w-full min-h-screen grid grid-cols-2 p-8">
+    <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2 p-8">
       <div className="col-span-1 my-auto p-2">
         <form>
           <FieldGroup>
