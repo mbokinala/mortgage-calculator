@@ -1,5 +1,11 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+} from "@/components/ui/chart";
 import {
   Field,
   FieldGroup,
@@ -19,21 +25,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IconCurrencyDollar, IconPercentage, IconChevronDown } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconCurrencyDollar,
+  IconPercentage,
+} from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-import { Label, Pie, PieChart } from "recharts";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Label, Pie, PieChart, TooltipProps } from "recharts";
 
 export default function Home() {
   const [price, setPrice] = useState<string>("");
@@ -41,7 +39,8 @@ export default function Home() {
   const [loanTerm, setLoanTerm] = useState<string>("");
   const [interestRate, setInterestRate] = useState<string>("");
   const [propertyTaxAnnual, setPropertyTaxAnnual] = useState<string>("");
-  const [homeownersInsuranceMonthly, setHomeownersInsuranceMonthly] = useState<string>("");
+  const [homeownersInsuranceMonthly, setHomeownersInsuranceMonthly] =
+    useState<string>("");
   const [pmiMonthly, setPmiMonthly] = useState<string>("");
   const [hoaFeesMonthly, setHoaFeesMonthly] = useState<string>("");
   const [showOptionalFields, setShowOptionalFields] = useState(false);
@@ -87,7 +86,9 @@ export default function Home() {
       }
     }
     if (homeownersInsuranceMonthly) {
-      const insuranceNum = parseFloat(homeownersInsuranceMonthly.replace(/,/g, ""));
+      const insuranceNum = parseFloat(
+        homeownersInsuranceMonthly.replace(/,/g, "")
+      );
       if (!Number.isNaN(insuranceNum)) {
         total += insuranceNum;
       }
@@ -105,7 +106,12 @@ export default function Home() {
       }
     }
     return total;
-  }, [propertyTaxAnnual, homeownersInsuranceMonthly, pmiMonthly, hoaFeesMonthly]);
+  }, [
+    propertyTaxAnnual,
+    homeownersInsuranceMonthly,
+    pmiMonthly,
+    hoaFeesMonthly,
+  ]);
 
   const totalMonthlyPayment = useMemo(() => {
     if (monthlyPayment === undefined) return undefined;
@@ -135,12 +141,14 @@ export default function Home() {
     },
   } satisfies ChartConfig;
 
+  type ChartDataType = {
+    name: string;
+    value: number;
+    fill: string;
+  };
+
   const chartData = useMemo(() => {
-    const data: Array<{
-      name: string;
-      value: number;
-      fill: string;
-    }> = [];
+    const data: Array<ChartDataType> = [];
 
     if (monthlyPayment !== undefined && monthlyPayment > 0) {
       data.push({
@@ -162,7 +170,9 @@ export default function Home() {
     }
 
     if (homeownersInsuranceMonthly) {
-      const insuranceAmount = parseFloat(homeownersInsuranceMonthly.replace(/,/g, ""));
+      const insuranceAmount = parseFloat(
+        homeownersInsuranceMonthly.replace(/,/g, "")
+      );
       if (!Number.isNaN(insuranceAmount) && insuranceAmount > 0) {
         data.push({
           name: "Homeowners Insurance",
@@ -195,7 +205,13 @@ export default function Home() {
     }
 
     return data;
-  }, [monthlyPayment, propertyTaxAnnual, homeownersInsuranceMonthly, pmiMonthly, hoaFeesMonthly]);
+  }, [
+    monthlyPayment,
+    propertyTaxAnnual,
+    homeownersInsuranceMonthly,
+    pmiMonthly,
+    hoaFeesMonthly,
+  ]);
 
   return (
     <div className="w-full min-h-screen grid grid-cols-2 p-8">
@@ -319,7 +335,9 @@ export default function Home() {
                     showOptionalFields ? "rotate-180" : ""
                   }`}
                 />
-                <span className="font-semibold">Additional Costs (Optional)</span>
+                <span className="font-semibold">
+                  Additional Costs (Optional)
+                </span>
               </button>
 
               {showOptionalFields && (
@@ -350,7 +368,9 @@ export default function Home() {
                         id="homeowners-insurance"
                         placeholder="150"
                         value={formatDollarAmount(homeownersInsuranceMonthly)}
-                        onChange={(e) => setHomeownersInsuranceMonthly(e.target.value)}
+                        onChange={(e) =>
+                          setHomeownersInsuranceMonthly(e.target.value)
+                        }
                       />
                       <InputGroupAddon>
                         <IconCurrencyDollar className="size-4" />
@@ -374,7 +394,9 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="hoa-fees">HOA Fees (Monthly)</FieldLabel>
+                    <FieldLabel htmlFor="hoa-fees">
+                      HOA Fees (Monthly)
+                    </FieldLabel>
                     <InputGroup>
                       <InputGroupInput
                         id="hoa-fees"
@@ -397,7 +419,10 @@ export default function Home() {
         <div className="text-center">
           <h1 className="font-extrabold text-4xl">Total Monthly Payment:</h1>
           <p className="text-4xl font-bold text-green-600 mt-4">
-            ${totalMonthlyPayment ? Math.round(totalMonthlyPayment).toLocaleString() : ""}
+            $
+            {totalMonthlyPayment
+              ? Math.round(totalMonthlyPayment).toLocaleString()
+              : ""}
           </p>
         </div>
 
@@ -416,7 +441,10 @@ export default function Home() {
                     <PieChart>
                       <ChartTooltip
                         cursor={false}
-                        content={({ active, payload }: any) => {
+                        content={({
+                          active,
+                          payload,
+                        }: TooltipProps<number, string>) => {
                           if (active && payload && payload.length > 0) {
                             const item = payload[0];
                             return (
@@ -424,12 +452,16 @@ export default function Home() {
                                 <div className="flex items-center gap-2 text-xs">
                                   {item.fill && (
                                     <div
-                                      className="h-2 w-2 rounded-full flex-shrink-0"
+                                      className="h-2 w-2 rounded-full shrink-0"
                                       style={{ backgroundColor: item.fill }}
                                     />
                                   )}
-                                  <span className="font-semibold">{item.name}</span>
-                                  <span className="font-bold">${(item.value as number).toLocaleString()}</span>
+                                  <span className="font-semibold">
+                                    {item.name}
+                                  </span>
+                                  <span className="font-bold">
+                                    ${(item.value as number).toLocaleString()}
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -459,7 +491,12 @@ export default function Home() {
                                     y={viewBox.cy}
                                     className="fill-foreground text-3xl font-bold"
                                   >
-                                    ${totalMonthlyPayment ? Math.round(totalMonthlyPayment).toLocaleString() : ""}
+                                    $
+                                    {totalMonthlyPayment
+                                      ? Math.round(
+                                          totalMonthlyPayment
+                                        ).toLocaleString()
+                                      : ""}
                                   </tspan>
                                   <tspan
                                     x={viewBox.cx}
@@ -482,7 +519,9 @@ export default function Home() {
 
             {additionalMonthlyFees > 0 && (
               <div className="w-full bg-gray-50 p-6 rounded-lg border">
-                <h2 className="font-semibold text-lg mb-4">Detailed Breakdown:</h2>
+                <h2 className="font-semibold text-lg mb-4">
+                  Detailed Breakdown:
+                </h2>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2">
@@ -494,59 +533,89 @@ export default function Home() {
                     </div>
                     <span>${Math.round(monthlyPayment).toLocaleString()}</span>
                   </div>
-                  {propertyTaxAnnual && parseFloat(propertyTaxAnnual.replace(/,/g, "")) > 0 && (
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: "var(--chart-2)" }}
-                        />
-                        <span>Property Tax (Monthly)</span>
+                  {propertyTaxAnnual &&
+                    parseFloat(propertyTaxAnnual.replace(/,/g, "")) > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: "var(--chart-2)" }}
+                          />
+                          <span>Property Tax (Monthly)</span>
+                        </div>
+                        <span>
+                          $
+                          {Math.round(
+                            parseFloat(propertyTaxAnnual.replace(/,/g, "")) / 12
+                          ).toLocaleString()}
+                        </span>
                       </div>
-                      <span>
-                        ${Math.round(parseFloat(propertyTaxAnnual.replace(/,/g, "")) / 12).toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-                  {homeownersInsuranceMonthly && parseFloat(homeownersInsuranceMonthly.replace(/,/g, "")) > 0 && (
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: "var(--chart-3)" }}
-                        />
-                        <span>Homeowners Insurance</span>
+                    )}
+                  {homeownersInsuranceMonthly &&
+                    parseFloat(homeownersInsuranceMonthly.replace(/,/g, "")) >
+                      0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: "var(--chart-3)" }}
+                          />
+                          <span>Homeowners Insurance</span>
+                        </div>
+                        <span>
+                          $
+                          {Math.round(
+                            parseFloat(
+                              homeownersInsuranceMonthly.replace(/,/g, "")
+                            )
+                          ).toLocaleString()}
+                        </span>
                       </div>
-                      <span>${Math.round(parseFloat(homeownersInsuranceMonthly.replace(/,/g, ""))).toLocaleString()}</span>
-                    </div>
-                  )}
-                  {pmiMonthly && parseFloat(pmiMonthly.replace(/,/g, "")) > 0 && (
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: "var(--chart-4)" }}
-                        />
-                        <span>PMI</span>
+                    )}
+                  {pmiMonthly &&
+                    parseFloat(pmiMonthly.replace(/,/g, "")) > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: "var(--chart-4)" }}
+                          />
+                          <span>PMI</span>
+                        </div>
+                        <span>
+                          $
+                          {Math.round(
+                            parseFloat(pmiMonthly.replace(/,/g, ""))
+                          ).toLocaleString()}
+                        </span>
                       </div>
-                      <span>${Math.round(parseFloat(pmiMonthly.replace(/,/g, ""))).toLocaleString()}</span>
-                    </div>
-                  )}
-                  {hoaFeesMonthly && parseFloat(hoaFeesMonthly.replace(/,/g, "")) > 0 && (
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: "var(--chart-5)" }}
-                        />
-                        <span>HOA Fees</span>
+                    )}
+                  {hoaFeesMonthly &&
+                    parseFloat(hoaFeesMonthly.replace(/,/g, "")) > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: "var(--chart-5)" }}
+                          />
+                          <span>HOA Fees</span>
+                        </div>
+                        <span>
+                          $
+                          {Math.round(
+                            parseFloat(hoaFeesMonthly.replace(/,/g, ""))
+                          ).toLocaleString()}
+                        </span>
                       </div>
-                      <span>${Math.round(parseFloat(hoaFeesMonthly.replace(/,/g, ""))).toLocaleString()}</span>
-                    </div>
-                  )}
+                    )}
                   <div className="border-t pt-3 flex justify-between font-semibold">
                     <span>Total</span>
-                    <span>${totalMonthlyPayment ? Math.round(totalMonthlyPayment).toLocaleString() : ""}</span>
+                    <span>
+                      $
+                      {totalMonthlyPayment
+                        ? Math.round(totalMonthlyPayment).toLocaleString()
+                        : ""}
+                    </span>
                   </div>
                 </div>
               </div>
